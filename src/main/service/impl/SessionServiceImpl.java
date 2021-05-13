@@ -1,6 +1,5 @@
 package main.service.impl;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import main.dbconnection.DBConnection;
 import main.model.*;
 import main.service.SessionService;
@@ -36,11 +35,11 @@ public class SessionServiceImpl implements SessionService {
         String sql = "";
         try {
             if (subGroupId != 0) {
-                sql = "select s.sessionId from Session s ,SessionLecture sl where s.sessionId= sl.sessionId and " +
+                sql = "select s.sessionId from session s ,sessionlecture sl where s.sessionId= sl.sessionId and " +
                         "sl.lecturerId = '" + lecId + "' and subjectId ='" + subId + "' " +
                         AND_TAGID + tagId + "' and (subGroupId ='" + subGroupId + "' or groupId =NULL)";
             } else if (mainGroupId != 0) {
-                sql = "select s.sessionId from Session s ,SessionLecture sl  where s.sessionId= sl.sessionId and " +
+                sql = "select s.sessionId from session s ,sessionlecture sl  where s.sessionId= sl.sessionId and " +
                         "sl.lecturerId  = '" + lecId + "' " +
                         "and subjectId ='" + subId + "' " +
                         AND_TAGID + tagId + "' and (subGroupId =NULL or groupId ='" + mainGroupId + "')";
@@ -70,11 +69,11 @@ public class SessionServiceImpl implements SessionService {
         String sql = "";
         try {
             if (subGroupId != 0) {
-                sql = "select sessionId from Session where" +
+                sql = "select sessionId from session where" +
                         " subjectId ='" + subId + "' " +
                         AND_TAGID + tagId + "' and (subGroupId ='" + subGroupId + "' or groupId =NULL)";
             } else if (mainGroupId != 0) {
-                sql = "select sessionId from Session where" +
+                sql = "select sessionId from session where" +
                         " subjectId ='" + subId + "' " +
                         AND_TAGID + tagId + "' and (groupId ='" + mainGroupId + "' or  subGroupId =NULL)";
             }
@@ -102,7 +101,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean saveDetails(NotAvailableSession nas) throws SQLException {
-        String sql = "Insert into NotAvailableSession Values(?,?,?,?,?)";
+        String sql = "Insert into notavailablesession Values(?,?,?,?,?)";
         PreparedStatement stm = connection.prepareStatement(sql);
         try {
             stm.setObject(1, 0);
@@ -124,25 +123,25 @@ public class SessionServiceImpl implements SessionService {
         try {
             if (!lecturer.isEmpty() && !subject.isEmpty()) {
                 sql = "select s.sessionId,mg.groupid,t.tagName,su.subName " +
-                        "from Session s ,Subject su,tag t,maingroup mg,SessionLecture sl ,Lecturer l " +
+                        "from session s ,subject su,tag t,maingroup mg,sessionlecture sl ,lecturer l " +
                         "where s.isConsecutive = 'Yes' and mg.id=s.groupId  and sl.sessionId= s.sessionId " +
                         "and l.employeeId= sl.lecturerId and " +
                         "su.subId = s.subjectId and t.tagid = s.tagId and s.consectiveAdded ='No' " +
                         "and l.employeeName='" + lecturer + "' and su.subId='" + subject + "' order by su.subName";
             } else if (lecturer.isEmpty() && subject.isEmpty()) {
                 sql = "select s.sessionId,mg.groupid,t.tagName,su.subName " +
-                        "from Session s ,Subject su,tag t,maingroup mg " +
+                        "from session s ,subject su,tag t,maingroup mg " +
                         "where s.isConsecutive = 'Yes' and mg.id=s.groupId  and " +
                         "su.subId = s.subjectId and t.tagid = s.tagId and s.consectiveAdded ='No' order by su.subName";
             } else if (lecturer.isEmpty() && !subject.isEmpty()) {
                 sql = "select s.sessionId,mg.groupid,t.tagName,su.subName " +
-                        "from Session s ,Subject su,tag t,maingroup mg " +
+                        "from session s ,subject su,tag t,maingroup mg " +
                         "where s.isConsecutive = 'Yes' and mg.id=s.groupId and " +
                         "su.subId = s.subjectId and t.tagid = s.tagId and s.consectiveAdded ='No' " +
                         "and su.subId='" + subject + "' order by su.subName";
             } else if (!lecturer.isEmpty() && subject.isEmpty()) {
                 sql = "select s.sessionId,mg.groupid,t.tagName,su.subName " +
-                        "from Session s ,Subject su,tag t,maingroup mg,SessionLecture sl ,Lecturer l " +
+                        "from session s ,subject su,tag t,maingroup mg,sessionlecture sl ,Lecturer l " +
                         "where s.isConsecutive = 'Yes' and mg.id=s.groupId  and sl.sessionId= s.sessionId " +
                         "and l.employeeId= sl.lecturerId and " +
                         "su.subId = s.subjectId and t.tagid = s.tagId and s.consectiveAdded ='No' " +
@@ -176,7 +175,7 @@ public class SessionServiceImpl implements SessionService {
         Statement stm = null;
         try {
             String sql = "select sessionId " +
-                    "from Session s ,maingroup mg ,Subject su,tag t " +
+                    "from session s ,maingroup mg ,subject su,tag t " +
                     "where s.isConsecutive = 'Yes'  and  mg.id=s.groupId and " +
                     "su.subId = s.subjectId and t.tagid = s.tagId  and " +
                     "mg.groupid ='" + groupId + "' and su.subName='" + subject + "' and t.tagName='" + tagName + "' ";
@@ -201,7 +200,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean updateRowForConsectiveSession(int id) throws SQLException {
-        String sql = "Update Session set consectiveAdded='Yes' where sessionId='" + id + "'";
+        String sql = "Update session set consectiveAdded='Yes' where sessionId='" + id + "'";
         Statement stm = connection.createStatement();
         try {
             return stm.executeUpdate(sql) > 0;
@@ -213,7 +212,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean saveCosectiveSession(int id, int id1) throws SQLException {
-        String sql = "Insert into ConsectiveSession Values(?,?,?)";
+        String sql = "Insert into consectivesession Values(?,?,?)";
         PreparedStatement stm = connection.prepareStatement(sql);
         try {
             stm.setObject(1, 0);
@@ -229,7 +228,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public boolean addSession(Session s1) throws SQLException {
         if (s1.getSubGroupId() != null) {
-            String sql = "Insert into Session(subjectId,tagId,groupId,subGroupId,studentCount,duration,isConsecutive,consectiveAdded,isParallel,category)  Values(?,?,?,?,?,?,?,?,?,?)";
+            String sql = "Insert into session(subjectId,tagId,groupId,subGroupId,studentCount,duration,isConsecutive,consectiveAdded,isParallel,category)  Values(?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement stm1 = connection.prepareStatement(sql);
             try {
                 stm1.setObject(1, s1.getSubjectId());
@@ -249,7 +248,7 @@ public class SessionServiceImpl implements SessionService {
             }
 
         } else {
-            String sql = "Insert into Session(subjectId,tagId,groupId,studentCount,duration,isConsecutive,consectiveAdded,isParallel,category)  Values(?,?,?,?,?,?,?,?,?)";
+            String sql = "Insert into session(subjectId,tagId,groupId,studentCount,duration,isConsecutive,consectiveAdded,isParallel,category)  Values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement stm2 = connection.prepareStatement(sql);
             try {
                 stm2.setObject(1, s1.getSubjectId());
@@ -273,7 +272,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public boolean addLectureSession(int lecturerId, int sessionId) throws SQLException {
 
-        String sql = "Insert into SessionLecture(lecturerId,sessionId) Values(?,?)";
+        String sql = "Insert into sessionlecture(lecturerId,sessionId) Values(?,?)";
         PreparedStatement stmt = connection.prepareStatement(sql);
         try {
             stmt.setObject(1, lecturerId);
@@ -289,7 +288,7 @@ public class SessionServiceImpl implements SessionService {
     public ArrayList<SessionDTO> getAllSessions() throws SQLException {
         Statement stm = null;
         try {
-            String sql = "Select s.sessionId,sub.subName,t.tagName,s.studentCount,s.duration,l.employeeName,m.mgroupName from Session s ,SessionLecture sl,Subject sub,Lecturer l,tag t,maingroup m where s. sessionId=sl.sessionId and s.tagId=t.tagid and s.subjectId=sub.subId and sl.lecturerId=l.employeeId and s.groupId=m.id order by sub.subName";
+            String sql = "Select s.sessionId,sub.subName,t.tagName,s.studentCount,s.duration,l.employeeName,m.mgroupName from session s ,sessionlecture sl,subject sub,lecturer l,tag t,maingroup m where s. sessionId=sl.sessionId and s.tagId=t.tagid and s.subjectId=sub.subId and sl.lecturerId=l.employeeId and s.groupId=m.id order by sub.subName";
             stm = connection.createStatement();
             try (ResultSet rst = stm.executeQuery(sql)) {
                 while (rst.next()) {
@@ -312,7 +311,7 @@ public class SessionServiceImpl implements SessionService {
         Statement stm = null;
         try {
             String sql="Select s.sessionId,sub.subName,t.tagName,s.studentCount,s.duration,l.employeeName,m.mgroupName " +
-                    "from Session s ,SessionLecture sl,Subject sub,Lecturer l,tag t,maingroup m " +
+                    "from session s ,sessionlecture sl,subject sub,lecturer l,tag t,maingroup m " +
                     "where s. sessionId=sl.sessionId and s.tagId=t.tagid and s.subjectId=sub.subId " +
                     "and sl.lecturerId=l.employeeId and s.groupId=m.id and (sub.subName='" + id+ "' OR l.employeeName='" + id+ "' " +
                     "OR m.mgroupName='" + id+ "')";
@@ -336,7 +335,7 @@ public class SessionServiceImpl implements SessionService {
         Statement stm = null;
         try {
             String sql = "select s.*,t.tagname " +
-                    "from Session s, tag t ,maingroup m " +
+                    "from session s, tag t ,maingroup m " +
                     "where s.tagId = t.tagid and s.groupId = m.id and m.groupid='" + groupId + "' and isParallel='No' " +
                     "order by s.subjectId";
             stm = connection.createStatement();
@@ -370,7 +369,7 @@ public class SessionServiceImpl implements SessionService {
         Statement stm = null;
         try {
             String sql = "select s.*,t.tagname " +
-                    "from Session s, tag t ,maingroup m " +
+                    "from session s, tag t ,maingroup m " +
                     "where s.tagId = t.tagid and s.groupId = m.id and m.groupid='" + trim + "' and s.isParallel='Yes' " +
                     "order by s.subjectId ";
             stm = connection.createStatement();
@@ -404,7 +403,7 @@ public class SessionServiceImpl implements SessionService {
         Statement stm = null;
         try {
             String sql = "select s.*,t.tagname " +
-                    "from Session s, tag t ,parrellSessions p " +
+                    "from session s, tag t ,parrellsessions p " +
                     "where s.tagId = t.tagid and s.sessionId = p.sessionId and p.orderId='" + orderId + "' " +
                     "order by s.subjectId ";
             stm = connection.createStatement();
